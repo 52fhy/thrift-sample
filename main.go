@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"crypto/tls"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"github.com/apache/thrift/lib/go/thrift"
@@ -20,38 +20,12 @@ type Greeter struct {
 }
 
 func (this *Greeter) SayHello(ctx context.Context, u *Sample.User) (r *Sample.Response, err error) {
-	return &Sample.Response{ErrCode: 0, ErrMsg: "success", Data: map[string]string{"name": "Hello " + u.Name}}, nil
+	strJson, _ := json.Marshal(u)
+	return &Sample.Response{ErrCode: 0, ErrMsg: "success", Data: map[string]string{"data": string(strJson)}}, nil
 }
 
 func (this *Greeter) GetUser(ctx context.Context, uid int32) (r *Sample.Response, err error) {
-	return &Sample.Response{}, nil
-}
-
-func runServer(transportFactory thrift.TTransportFactory, protocolFactory thrift.TProtocolFactory, addr string, secure bool) error {
-	var transport thrift.TServerTransport
-	var err error
-	if secure {
-		cfg := new(tls.Config)
-		if cert, err := tls.LoadX509KeyPair("server.crt", "server.key"); err == nil {
-			cfg.Certificates = append(cfg.Certificates, cert)
-		} else {
-			return err
-		}
-		transport, err = thrift.NewTSSLServerSocket(addr, cfg)
-	} else {
-		transport, err = thrift.NewTServerSocket(addr)
-	}
-
-	if err != nil {
-		return err
-	}
-	fmt.Printf("%T\n", transport)
-	handler := &Greeter{}
-	processor := Sample.NewGreeterProcessor(handler)
-	server := thrift.NewTSimpleServer4(processor, transport, transportFactory, protocolFactory)
-
-	fmt.Println("Starting the simple server... on ", addr)
-	return server.Serve()
+	return &Sample.Response{ErrCode: 1, ErrMsg: "user not exist."}, nil
 }
 
 func main() {
@@ -60,10 +34,10 @@ func main() {
 	framed := flag.Bool("framed", false, "Use framed transport")
 	buffered := flag.Bool("buffered", false, "Use buffered transport")
 	addr := flag.String("addr", "localhost:9090", "Address to listen to")
-	secure := flag.Bool("secure", false, "Use tls secure transport")
 
 	flag.Parse()
 
+	//protocol
 	var protocolFactory thrift.TProtocolFactory
 	switch *protocol {
 	case "compact":
@@ -80,6 +54,7 @@ func main() {
 		os.Exit(1)
 	}
 
+	//buffered
 	var transportFactory thrift.TTransportFactory
 	if *buffered {
 		transportFactory = thrift.NewTBufferedTransportFactory(8192)
@@ -87,11 +62,30 @@ func main() {
 		transportFactory = thrift.NewTTransportFactory()
 	}
 
+	//framed
 	if *framed {
 		transportFactory = thrift.NewTFramedTransportFactory(transportFactory)
 	}
 
-	if err := runServer(transportFactory, protocolFactory, *addr, *secure); err != nil {
+	//handler
+	handler := &Greeter{}
+
+	//transport,no secure
+	var err error
+	var transport thrift.TServerTransport
+	transport, err = thrift.NewTServerSocket(*addr)
+	if err != nil {
+		fmt.Println("error running server:", err)
+	}
+
+	//processor
+	processor := Sample.NewGreeterProcessor(handler)
+
+	fmt.Println("Starting the simple server... on ", *addr)
+	server := thrift.NewTSimpleServer4(processor, transport, transportFactory, protocolFactory)
+	err = server.Serve()
+
+	if err != nil {
 		fmt.Println("error running server:", err)
 	}
 }
