@@ -10,7 +10,7 @@ rm -rf $output/*
 mkdir -p $output/php $output/go/ 
 
 #编译
-thrift -r --gen go $thrift/Sample.thrift
-thrift -r --gen php $thrift/Sample.thrift
+thrift -r --gen go $thrift/Service.thrift
+thrift -r --gen php:server $thrift/Service.thrift
 
 echo "done";

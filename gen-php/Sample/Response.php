@@ -110,16 +110,16 @@ class Response
                 case 3:
                     if ($ftype == TType::MAP) {
                         $this->data = array();
-                        $_size7 = 0;
-                        $_ktype8 = 0;
-                        $_vtype9 = 0;
-                        $xfer += $input->readMapBegin($_ktype8, $_vtype9, $_size7);
-                        for ($_i11 = 0; $_i11 < $_size7; ++$_i11) {
-                            $key12 = '';
-                            $val13 = '';
-                            $xfer += $input->readString($key12);
-                            $xfer += $input->readString($val13);
-                            $this->data[$key12] = $val13;
+                        $_size0 = 0;
+                        $_ktype1 = 0;
+                        $_vtype2 = 0;
+                        $xfer += $input->readMapBegin($_ktype1, $_vtype2, $_size0);
+                        for ($_i4 = 0; $_i4 < $_size0; ++$_i4) {
+                            $key5 = '';
+                            $val6 = '';
+                            $xfer += $input->readString($key5);
+                            $xfer += $input->readString($val6);
+                            $this->data[$key5] = $val6;
                         }
                         $xfer += $input->readMapEnd();
                     } else {
@@ -156,9 +156,9 @@ class Response
             }
             $xfer += $output->writeFieldBegin('data', TType::MAP, 3);
             $output->writeMapBegin(TType::STRING, TType::STRING, count($this->data));
-            foreach ($this->data as $kiter14 => $viter15) {
-                $xfer += $output->writeString($kiter14);
-                $xfer += $output->writeString($viter15);
+            foreach ($this->data as $kiter7 => $viter8) {
+                $xfer += $output->writeString($kiter7);
+                $xfer += $output->writeString($viter8);
             }
             $output->writeMapEnd();
             $xfer += $output->writeFieldEnd();

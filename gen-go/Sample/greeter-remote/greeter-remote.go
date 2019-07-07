@@ -150,19 +150,19 @@ func main() {
       fmt.Fprintln(os.Stderr, "SayHello requires 1 args")
       flag.Usage()
     }
-    arg9 := flag.Arg(1)
-    mbTrans10 := thrift.NewTMemoryBufferLen(len(arg9))
-    defer mbTrans10.Close()
-    _, err11 := mbTrans10.WriteString(arg9)
-    if err11 != nil {
+    arg8 := flag.Arg(1)
+    mbTrans9 := thrift.NewTMemoryBufferLen(len(arg8))
+    defer mbTrans9.Close()
+    _, err10 := mbTrans9.WriteString(arg8)
+    if err10 != nil {
       Usage()
       return
     }
-    factory12 := thrift.NewTJSONProtocolFactory()
-    jsProt13 := factory12.GetProtocol(mbTrans10)
+    factory11 := thrift.NewTJSONProtocolFactory()
+    jsProt12 := factory11.GetProtocol(mbTrans9)
     argvalue0 := Sample.NewUser()
-    err14 := argvalue0.Read(jsProt13)
-    if err14 != nil {
+    err13 := argvalue0.Read(jsProt12)
+    if err13 != nil {
       Usage()
       return
     }
@@ -175,8 +175,8 @@ func main() {
       fmt.Fprintln(os.Stderr, "GetUser requires 1 args")
       flag.Usage()
     }
-    tmp0, err15 := (strconv.Atoi(flag.Arg(1)))
-    if err15 != nil {
+    tmp0, err14 := (strconv.Atoi(flag.Arg(1)))
+    if err14 != nil {
       Usage()
       return
     }

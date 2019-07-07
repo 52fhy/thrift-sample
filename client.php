@@ -10,6 +10,7 @@ use Thrift\ClassLoader\ThriftClassLoader;
 use Thrift\Protocol\TBinaryProtocol;
 use Thrift\Transport\TSocket;
 use Thrift\Transport\TBufferedTransport;
+use \Thrift\Transport\THttpClient;
 
 $loader = new ThriftClassLoader();
 $loader->registerNamespace('Thrift', $ROOT_DIR);
@@ -17,7 +18,11 @@ $loader->registerDefinition('Sample', $GEN_DIR);
 $loader->register();
 
 try {
-    $socket = new TSocket('localhost', 9090);
+    if (array_search('--http', $argv)) {
+        $socket = new THttpClient('localhost', 8080, '/server.php');
+    } else {
+        $socket = new TSocket('localhost', 9090);
+    }
     $transport = new TBufferedTransport($socket, 1024, 1024);
     $protocol = new TBinaryProtocol($transport);
     $client = new \Sample\GreeterClient($protocol);

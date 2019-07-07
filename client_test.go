@@ -15,6 +15,7 @@ func GetClient() *Sample.GreeterClient {
 	var transport thrift.TTransport
 	var err error
 	transport, err = thrift.NewTSocket(addr)
+	//transport, err = thrift.NewTHttpClient(addr)
 	if err != nil {
 		fmt.Println("Error opening socket:", err)
 	}
